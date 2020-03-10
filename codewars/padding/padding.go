@@ -1,7 +1,11 @@
 package padding
 
-func padding(i, w int) []byte {
-	buf := [20]byte{}
+import (
+	"fmt"
+	"strconv"
+)
 
-	return buf[:]
+func padding(i, w int) []byte {
+	flag := fmt.Sprintf("%%0%ds", w)
+	return []byte(fmt.Sprintf(flag, strconv.Itoa(i)))
 }
