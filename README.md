@@ -6,7 +6,7 @@
 ## 题目
 
 - [ ] [Range extraction](/codewars/range.extraction/README.md)
-- [ ] [padding](/codewars/padding/README.md)
+- [x] [padding](/codewars/padding/README.md)
 
 ## License
 
