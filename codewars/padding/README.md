@@ -18,10 +18,10 @@
     goos: linux
     goarch: amd64
     pkg: github.com/fight100year/go-ci-test-workflows-template/codewars/padding
-    BenchmarkPadding-4         	  927896   	      1163 ns/op	     120 B/op	      15 allocs/op
-    BenchmarkPaddingNoStd-4    	11957875	        98.1 ns/op	      16 B/op	       3 allocs/op
-    BenchmarkPaddingNoStd2-4   	11913781	        98.9 ns/op	      16 B/op	       3 allocs/op
-    BenchmarkPaddingStd-4      	12566420	        90.9 ns/op	      16 B/op	       3 allocs/op
+    BenchmarkPadding-4        927896    1163 ns/op  120 B/op  15 allocs/op
+    BenchmarkPaddingNoStd-4   11957875  98.1 ns/op  16 B/op   3 allocs/op
+    BenchmarkPaddingNoStd2-4  11913781  98.9 ns/op  16 B/op   3 allocs/op
+    BenchmarkPaddingStd-4     12566420  90.9 ns/op  16 B/op   3 allocs/op
 
 - padding是基于标准库实现的,性能最差,和其他实现相差一个数量级
 - std是标准库中的实现,NoStd是手写的
