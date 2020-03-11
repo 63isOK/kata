@@ -34,9 +34,13 @@ func solution(in []int) (ret string) {
 		} else {
 			click++
 			if i == len(in)-1 {
+				if click == 1 {
+					ret += ","
+					ret += strconv.Itoa(in[i])
+					break
+				}
 				ret += "-"
 				ret += strconv.Itoa(in[i])
-				break
 			}
 		}
 	}
@@ -66,7 +70,11 @@ func solution2(in []int) (ret string) {
 		} else {
 			click++
 			if i == len(in)-1 {
-				ret += fmt.Sprintf("-%d", in[i])
+				if click == 1 {
+					ret += fmt.Sprintf(",%d", in[i])
+				} else {
+					ret += fmt.Sprintf("-%d", in[i])
+				}
 				break
 			}
 		}
