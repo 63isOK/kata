@@ -1,4 +1,4 @@
-package kata
+package rangeint
 
 import "testing"
 
@@ -18,5 +18,22 @@ func TestAll(t *testing.T) {
 		if got != x.out {
 			t.Fatalf("want:%q, got:%q", x.out, got)
 		}
+
+		got2 := solution2(x.in)
+		if got2 != x.out {
+			t.Fatalf("want:%q, got:%q", x.out, got)
+		}
+	}
+}
+
+func BenchmarkSolution(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		solution([]int{-6, -3, -2, -1, 0, 1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20})
+	}
+}
+
+func BenchmarkSolution2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		solution2([]int{-6, -3, -2, -1, 0, 1, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 17, 18, 19, 20})
 	}
 }

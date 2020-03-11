@@ -43,3 +43,16 @@ Show the output of your program.
 有序整数列表的表示方法,要么是单个整数,要么是`范围整数`的写法,
 所谓范围整数的写法,就是超过3个连续的整数可写成a-b,a是最小数,
 b是最大数.不管是单个整数还是范围整数,都是用逗号隔开
+
+## 测试结果
+
+    goos: linux
+    goarch: amd64
+    pkg: github.com/fight100year/go-ci-test-workflows-template/codewars/range.extraction
+    BenchmarkSolution-4   936351  1126 ns/op  400 B/op  22 allocs/op
+    BenchmarkSolution2-4  675604  1513 ns/op  272 B/op  24 allocs/op
+    PASS
+    ok github.com/fight100year/codewars/range.extraction  2.112s
+
+第二种解法使用了fmt.Sprintf来格式化输出,效率比strconv库差太多了,
+其次,这类问题使用普通的for语句真心好处理
