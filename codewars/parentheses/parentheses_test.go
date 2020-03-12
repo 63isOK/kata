@@ -18,7 +18,7 @@ var tests = []tester{
 
 type targetFunc func(string) bool
 
-var targets = []targetFunc{valid}
+var targets = []targetFunc{valid, validFor, validRegexp, validSwitch}
 
 func TestAll(t *testing.T) {
 	for _, data := range tests {
@@ -34,5 +34,23 @@ func TestAll(t *testing.T) {
 func BenchmarkValid(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		valid("(())((()())())")
+	}
+}
+
+func BenchmarkValidFor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		validFor("(())((()())())")
+	}
+}
+
+func BenchmarkValidRegexp(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		validRegexp("(())((()())())")
+	}
+}
+
+func BenchmarkValidSwitch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		validSwitch("(())((()())())")
 	}
 }
