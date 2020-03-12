@@ -16,11 +16,17 @@ var tests = []tester{
 	{"(())((()())())", true},
 }
 
+type targetFunc func(string) bool
+
+var targets = []targetFunc{valid}
+
 func TestAll(t *testing.T) {
-	for _, x := range tests {
-		got := valid(x.in)
-		if x.out != got {
-			t.Fatalf("%q, want:%t, got:%t", x.in, x.out, got)
+	for _, data := range tests {
+		for _, f := range targets {
+			got := f(data.in)
+			if data.out != got {
+				t.Fatalf("%q, want:%t, got:%t", data.in, data.out, got)
+			}
 		}
 	}
 }
