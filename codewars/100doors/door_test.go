@@ -14,8 +14,7 @@ const want = `
 0 0 0 1 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 1 0 0 0 0 0 0 0 0 0 
-0 0 0 0 0 0 0 0 0 1 
-`
+0 0 0 0 0 0 0 0 0 1 `
 
 var tests = map[string]func() []bool{
 	"doorFor": doorFor,
@@ -35,15 +34,15 @@ func TestAll(t *testing.T) {
 func printString(t *testing.T, b []bool) string {
 	t.Helper()
 
-	ret := "\n"
+	ret := ""
 	for i, x := range b {
+		if i%10 == 0 {
+			ret += "\n"
+		}
 		if x {
 			ret += "1 "
 		} else {
 			ret += "0 "
-		}
-		if i%10 == 0 {
-			ret += "\n"
 		}
 	}
 
