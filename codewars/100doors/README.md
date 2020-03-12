@@ -27,3 +27,18 @@
 - 什么样的数的约数个数是奇数的
   - 8=1x8 2x4 那么看来只有一个数的平方才是我们要找的
 - 平方数就是我们要找的
+
+## 性能测试数据分析
+
+    goos: linux
+    goarch: amd64
+    pkg: github.com/fight100year/go-ci-test-workflows-template/codewars/100doors
+    BenchmarkDoorFor-4      2103446     560 ns/op     112 B/op    1 allocs/op
+    BenchmarkDoorFactor-4   20979451    54.5 ns/op    112 B/op    1 allocs/op
+    PASS
+    ok    github.com/fight100year/codewars/100doors   2.962s
+
+从数据可以看出,如果只是简单将问题用代码描述出来,
+性能和深入分析之后的差一个数量级.深入分析之后,才可以真正了解题意.
+
+所以每次在解决问题之前,先花点时间理解深层次的意义非常重要.
