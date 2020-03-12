@@ -7,7 +7,7 @@
 
 - [x] [Range extraction](/codewars/range.extraction/README.md)
 - [x] [padding](/codewars/padding/README.md)
-- [ ] [vaild parentheses](/codewars/parentheses/README.md)
+- [x] [vaild parentheses](/codewars/parentheses/README.md)
 
 ## License
 
