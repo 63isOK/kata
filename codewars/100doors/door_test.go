@@ -17,7 +17,8 @@ const want = `
 0 0 0 0 0 0 0 0 0 1 `
 
 var tests = map[string]func() []bool{
-	"doorFor": doorFor,
+	"doorFor":    doorFor,
+	"doorFactor": doorFactor,
 }
 
 func TestAll(t *testing.T) {
@@ -52,5 +53,11 @@ func printString(t *testing.T, b []bool) string {
 func BenchmarkDoorFor(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		doorFor()
+	}
+}
+
+func BenchmarkDoorFactor(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		doorFactor()
 	}
 }
