@@ -5,7 +5,7 @@ import (
 )
 
 var px, py = 0, 0
-var pdata = 0
+var pdata [16]int
 
 func TestConStruct(t *testing.T) {
 	p := New()
@@ -17,7 +17,7 @@ func TestConStruct(t *testing.T) {
 func checkDuplicate(t *testing.T, p *Puzzle) {
 	t.Helper()
 
-	data = p.GetData()
+	data := p.Data()
 
 	checkCount := 0
 
@@ -25,7 +25,7 @@ func checkDuplicate(t *testing.T, p *Puzzle) {
 		for _, x := range data {
 			if i == x {
 				checkCount++
-				continue
+				break
 			}
 		}
 	}
@@ -86,14 +86,14 @@ func checkSwap(t *testing.T, do string, x, y, index int) {
 	}
 	data := Data()
 	if data[index] != 0 {
-		t.Fatalf("%s,data[index] must be 0", do, index)
+		t.Fatalf("%s,data[%d] must be 0", do, index)
 	}
 
-	if std.handler.(func(int, int)) {
+	if _, ok := std.handler.(func(int, int)); !ok {
 		if px != x || py != y {
 			t.Fatalf("%s,want:(%d,%d),callback get:(%d,%d)", do, x, y, px, py)
 		}
-	} else if std.handler.(func([16]int)) {
+	} else if _, ok = std.handler.(func([16]int)); !ok {
 		if pdata[index] != 0 {
 			t.Fatalf("%s,want:0,pdata[%d] get:(%d)", do, index, pdata[index])
 		}

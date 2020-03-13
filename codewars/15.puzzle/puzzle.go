@@ -31,7 +31,7 @@ func New() *Puzzle {
 	p := &Puzzle{data: [16]int{}}
 	p.randomFill()
 
-	go waitMoveEvent()
+	go p.waitMoveEvent()
 
 	return p
 }
@@ -41,6 +41,8 @@ func (p *Puzzle) ReStart() (x, y int) {
 	p.randomFill()
 
 	// todo review
+
+	return p.x, p.y
 }
 
 func (p *Puzzle) randomFill() {
@@ -65,11 +67,14 @@ func (p *Puzzle) Data() [16]int {
 //    func(int,int), app use x,y
 //    func([16]int), app use whole puzzle data
 func (p *Puzzle) Notify(handler interface{}) error {
-	if !handler.(func(int, int)) && !handler.(func([16]int)) {
+	_, ok1 := handler.(func(int, int))
+	_, ok2 := handler.(func([16]int))
+	if !ok1 && !ok2 {
 		return errors.New("callback format is incorrect")
 	}
 
 	p.handler = handler
+	return nil
 }
 
 // Send is send signal to Puzzle object
@@ -81,12 +86,12 @@ var std = New()
 
 // Restart is restart game with default puzzle
 func Restart() (x, y int) {
-	std.ReStart()
+	return std.ReStart()
 }
 
 // Position get piece's position of default puzzle
 func Position() (x, y int) {
-	return std.Position(x, y)
+	return std.Position()
 }
 
 // Data get all info of default puzzle
@@ -103,6 +108,6 @@ func Notify(handler interface{}) error {
 }
 
 // Send is send a signal to default puzzle
-func Send(s signal) {
+func Send(s Signal) {
 	std.Send(s)
 }
