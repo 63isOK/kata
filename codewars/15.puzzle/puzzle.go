@@ -4,23 +4,27 @@ import (
 	"errors"
 )
 
+// move event
+const (
+	UP Signal = iota + 1
+	DOWN
+	LEFT
+	RIGHT
+	ReStart
+	Quit
+)
+
+// Signal is move direction
+type Signal int
+
 // Puzzle si a 4*4 puzzle
 type Puzzle struct {
 	data    [16]int
 	x, y    int
 	handler interface{} // Notify func
 	// review  []int
+	signal chan Signal
 }
-
-// move event
-const (
-	UP    = 8
-	DOWN  = 2
-	LEFT  = 4
-	RIGHT = 6
-)
-
-var moveCh chan int
 
 // New create a Puzzle
 func New() *Puzzle {
@@ -68,6 +72,11 @@ func (p *Puzzle) Notify(handler interface{}) error {
 	p.handler = handler
 }
 
+// Send is send signal to Puzzle object
+func (p *Puzzle) Send(s Signal) {
+
+}
+
 var std = New()
 
 // Restart is restart game with default puzzle
@@ -91,4 +100,9 @@ func Data() [16]int {
 //    func([16]int), app use whole puzzle data
 func Notify(handler interface{}) error {
 	return std.Notify(handler)
+}
+
+// Send is send a signal to default puzzle
+func Send(s signal) {
+	std.Send(s)
 }
