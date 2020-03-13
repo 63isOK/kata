@@ -34,3 +34,15 @@ func (p *Puzzle) ReStart() {
 // Start is game start
 func (p *Puzzle) Start() {
 }
+
+var std = New()
+
+// Start is start game with default puzzle
+func Start() {
+	std.Start()
+}
+
+// Restart is restart game with default puzzle
+func Restart() {
+	std.ReStart()
+}
