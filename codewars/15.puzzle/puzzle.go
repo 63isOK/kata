@@ -1,11 +1,15 @@
 package puzzle
 
+import (
+	"errors"
+)
+
 // Puzzle si a 4*4 puzzle
 type Puzzle struct {
 	data    [16]int
 	x, y    int
 	handler interface{} // Notify func
-	review  []int
+	// review  []int
 }
 
 // move event
@@ -16,34 +20,39 @@ const (
 	RIGHT = 6
 )
 
-var event chan int
+var moveCh chan int
 
 // New create a Puzzle
 func New() *Puzzle {
-	p = &Puzzle{}
-	return p.init()
-}
+	p := &Puzzle{data: [16]int{}}
+	p.randomFill()
 
-func (p *Puzzle) init() *Puzzle {
+	go waitMoveEvent()
+
 	return p
 }
 
 // ReStart is restart a new game
-func (p *Puzzle) ReStart() {
-	Start()
+func (p *Puzzle) ReStart() (x, y int) {
+	p.randomFill()
+
+	// todo review
 }
 
-// Start is game start
-func (p *Puzzle) Start() {
+func (p *Puzzle) randomFill() {
 }
 
-// GetPiecePosition get piece's position
-func (p *Puzzle) GetPiecePosition() (x, y int) {
-	return 0, 0
+func (p *Puzzle) waitMoveEvent() {
+
 }
 
-// GetData get all info of puzzle
-func (p *Puzzle) GetData() [16]int {
+// Position get piece's position
+func (p *Puzzle) Position() (x, y int) {
+	return p.x, p.y
+}
+
+// Data get all info of puzzle
+func (p *Puzzle) Data() [16]int {
 	return p.data
 }
 
@@ -51,36 +60,35 @@ func (p *Puzzle) GetData() [16]int {
 // there are two way for notify:
 //    func(int,int), app use x,y
 //    func([16]int), app use whole puzzle data
-func (p *Puzzle) Notify(handler interface{}) {
+func (p *Puzzle) Notify(handler interface{}) error {
+	if !handler.(func(int, int)) && !handler.(func([16]int)) {
+		return errors.New("callback format is incorrect")
+	}
+
 	p.handler = handler
 }
 
 var std = New()
 
-// Start is start game with default puzzle
-func Start() {
-	std.Start()
-}
-
 // Restart is restart game with default puzzle
-func Restart() {
+func Restart() (x, y int) {
 	std.ReStart()
 }
 
-// GetPiecePosition get piece's position of default puzzle
-func GetPiecePosition() (x, y int) {
-	return std.GetPiecePosition(x, y)
+// Position get piece's position of default puzzle
+func Position() (x, y int) {
+	return std.Position(x, y)
 }
 
-// GetData get all info of default puzzle
-func GetData() [16]int {
-	return std.GetData()
+// Data get all info of default puzzle
+func Data() [16]int {
+	return std.Data()
 }
 
 // Notify is a event fire on move event done
 // there are two way for notify:
 //    func(int,int), app use x,y
 //    func([16]int), app use whole puzzle data
-func Notify(handler interface{}) {
-	std.Notify(handler)
+func Notify(handler interface{}) error {
+	return std.Notify(handler)
 }
