@@ -1,6 +1,7 @@
 package puzzle
 
 import (
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -11,24 +12,20 @@ const (
 	DOWN
 	LEFT
 	RIGHT
-	ReStart
+	NEW
 	Quit
 )
 
 // Signal is move direction
 type Signal int
 
-// Pos is x,y of puzzle
-type Pos struct {
-	x, y int
-}
+// Data is puzzle's data
+type Data [16]int
 
 // Puzzle si a 4*4 puzzle
 type Puzzle struct {
-	data           [16]int
-	x, y           int
-	notifyPosition chan<- Pos     // Notify channel
-	notifyData     chan<- [16]int // Notify channel
+	data   Data
+	notify chan<- Data
 	// review  []int
 	signal chan Signal
 	isDone bool
@@ -45,13 +42,18 @@ func New() *Puzzle {
 	return p
 }
 
+// Start is start a new game
+func (p *Puzzle) Start() Data {
+	return p.ReStart()
+}
+
 // ReStart is restart a new game
-func (p *Puzzle) ReStart() (x, y int) {
+func (p *Puzzle) ReStart() Data {
 	p.init()
 
 	// todo review
 
-	return p.x, p.y
+	return p.data
 }
 
 func (p *Puzzle) init() {
@@ -65,39 +67,24 @@ func (p *Puzzle) init() {
 		p.data[i-1], p.data[random] = p.data[random], p.data[i-1]
 	}
 
-	//  1  2  3  4
-	//  5  6  7  8
-	//  9 10 11 12
-	// 13 14 15 16
-	// s = (y-1)*4 + x
-	for i := 0; i < 16; i++ {
+	p.isDone = false
+}
+
+func (p *Puzzle) getSwapIndex() (int, error) {
+	for i := range p.data {
 		if p.data[i] == 0 {
-			i++
-			if i < 5 {
-				p.y = 1
-				p.x = i
-			} else if i < 9 {
-				p.y = 2
-				p.x = i - 4
-			} else if i < 13 {
-				p.y = 3
-				p.x = i - 8
-			} else {
-				p.y = 4
-				p.x = i - 12
-			}
-			break
+			return i, nil
 		}
 	}
 
-	p.isDone = false
+	return 0, errors.New("invalid data")
 }
 
 func (p *Puzzle) waitMoveEvent() {
 	for {
 		select {
 		case s := <-p.signal:
-			if s == ReStart {
+			if s == NEW {
 				p.ReStart()
 				continue
 			}
@@ -106,36 +93,38 @@ func (p *Puzzle) waitMoveEvent() {
 				continue
 			}
 
-			if (s == UP && p.y == 1) ||
-				(s == DOWN && p.y == 4) ||
-				(s == LEFT && p.x == 1) ||
-				(s == RIGHT && p.x == 4) {
+			index, err := p.getSwapIndex()
+			if err != nil {
+				panic(err.Error())
+			}
+
+			if (s == UP && index < 4) ||
+				(s == DOWN && index > 11) ||
+				(s == LEFT && index%4 == 0) ||
+				(s == RIGHT && index%4 == 3) {
+
+				if p.notify != nil {
+					p.notify <- p.data
+				}
 				continue
 			}
 
 			switch s {
 			case UP:
-				p.data[p.y*4+p.x-5], p.data[p.y*4+p.x-9] = p.data[p.y*4+p.x-9], p.data[p.y*4+p.x-5]
-				p.y--
+				p.data[index], p.data[index-4] = p.data[index-4], p.data[index]
 			case DOWN:
-				p.data[p.y*4+p.x-5], p.data[p.y*4+p.x-1] = p.data[p.y*4+p.x-1], p.data[p.y*4+p.x-5]
-				p.y++
+				p.data[index], p.data[index+4] = p.data[index+4], p.data[index]
 			case LEFT:
-				p.data[p.y*4+p.x-5], p.data[p.y*4+p.x-6] = p.data[p.y*4+p.x-6], p.data[p.y*4+p.x-5]
-				p.x--
+				p.data[index], p.data[index-1] = p.data[index-1], p.data[index]
 			case RIGHT:
-				p.data[p.y*4+p.x-5], p.data[p.y*4+p.x-4] = p.data[p.y*4+p.x-4], p.data[p.y*4+p.x-5]
-				p.x++
+				p.data[index], p.data[index+1] = p.data[index+1], p.data[index]
 			}
 
-			if p.notifyPosition != nil {
-				p.notifyPosition <- Pos{p.x, p.y}
-			}
-			if p.notifyData != nil {
-				p.notifyData <- p.data
+			if p.notify != nil {
+				p.notify <- p.data
 			}
 
-			if p.x == 4 && p.y == 4 {
+			if index == 15 {
 				p.checkDone()
 			}
 		}
@@ -149,27 +138,13 @@ func (p *Puzzle) checkDone() {
 		}
 	}
 
+	p.isDone = true
 	p.done <- 1
 }
 
-// Position get piece's position
-func (p *Puzzle) Position() (x, y int) {
-	return p.x, p.y
-}
-
-// Data get all info of puzzle
-func (p *Puzzle) Data() [16]int {
-	return p.data
-}
-
-// NotifyPosition is a event fire on move event done
-func (p *Puzzle) NotifyPosition(c chan<- Pos) {
-	p.notifyPosition = c
-}
-
-// NotifyData is a event fire on move event done
-func (p *Puzzle) NotifyData(c chan<- [16]int) {
-	p.notifyData = c
+// Notify is a event fire on move event done
+func (p *Puzzle) Notify(c chan<- Data) {
+	p.notify = c
 }
 
 // Send is send signal to Puzzle object
@@ -184,32 +159,27 @@ func (p *Puzzle) Done() <-chan interface{} {
 
 var std = New()
 
-// Restart is restart game with default puzzle
-func Restart() (x, y int) {
+// Start is start a new game
+func Start() Data {
+	return std.Start()
+}
+
+// ReStart is restart a new game
+func ReStart() Data {
 	return std.ReStart()
 }
 
-// Position get piece's position of default puzzle
-func Position() (x, y int) {
-	return std.Position()
+// Notify is a event fire on move event done
+func Notify(c chan<- Data) {
+	std.Notify(c)
 }
 
-// Data get all info of default puzzle
-func Data() [16]int {
-	return std.Data()
-}
-
-// NotifyPosition is a event fire on move event done
-func NotifyPosition(c chan<- Pos) {
-	std.NotifyPosition(c)
-}
-
-// NotifyData is a event fire on move event done
-func NotifyData(c chan<- [16]int) {
-	std.NotifyData(c)
-}
-
-// Send is send a signal to default puzzle
+// Send is send signal to Puzzle object
 func Send(s Signal) {
 	std.Send(s)
+}
+
+// Done get done channel
+func Done() <-chan interface{} {
+	return std.Done()
 }
