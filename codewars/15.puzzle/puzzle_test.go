@@ -4,8 +4,13 @@ import (
 	"testing"
 )
 
-var px, py = 0, 0
-var pdata [16]int
+var position chan Pos
+var allData chan [16]int
+
+func init() {
+	position = make(chan Pos)
+	allData = make(chan [16]int)
+}
 
 func TestConStruct(t *testing.T) {
 	p := New()
@@ -35,6 +40,24 @@ func checkDuplicate(t *testing.T, p *Puzzle) {
 	}
 }
 
+func TestPos(t *testing.T) {
+	for i := 0; i < 300; i++ {
+		checkZero(t)
+		Restart()
+	}
+}
+
+func checkZero(t *testing.T) {
+	t.Helper()
+
+	data := Data()
+	x, y := Position()
+	index := y*4 + x - 5
+	if index < 0 || index >= 16 || data[index] != 0 {
+		t.Fatalf("calc is wrong, (%d,%d),%v", x, y, data)
+	}
+}
+
 func TestStd(t *testing.T) {
 	Send(UP)
 	Send(UP)
@@ -42,12 +65,9 @@ func TestStd(t *testing.T) {
 	Send(LEFT)
 	Send(LEFT)
 	Send(LEFT)
-
-	Notify(func(x, y int) {
-		px, py = x, y
-	})
-
 	checkSwap(t, "init status", 1, 1, 0)
+
+	NotifyPosition(position)
 	Send(LEFT)
 	checkSwap(t, "unreach left", 1, 1, 0)
 	Send(UP)
@@ -62,9 +82,8 @@ func TestStd(t *testing.T) {
 	Send(DOWN)
 	checkSwap(t, "2 right, 2 down", 3, 3, 10)
 
-	Notify(func(data [16]int) {
-		pdata = data
-	})
+	// NotifyPosition(nil)
+	NotifyData(allData)
 
 	Send(RIGHT)
 	checkSwap(t, "3 right, 2 down", 4, 3, 14)
@@ -89,11 +108,15 @@ func checkSwap(t *testing.T, do string, x, y, index int) {
 		t.Fatalf("%s,data[%d] must be 0", do, index)
 	}
 
-	if _, ok := std.handler.(func(int, int)); !ok {
+	if std.notifyPosition != nil {
+		pos := <-position
+		px, py := pos.x, pos.y
 		if px != x || py != y {
 			t.Fatalf("%s,want:(%d,%d),callback get:(%d,%d)", do, x, y, px, py)
 		}
-	} else if _, ok = std.handler.(func([16]int)); !ok {
+	}
+	if std.notifyData != nil {
+		pdata := <-allData
 		if pdata[index] != 0 {
 			t.Fatalf("%s,want:0,pdata[%d] get:(%d)", do, index, pdata[index])
 		}
