@@ -16,6 +16,7 @@ const (
 	LEFT
 	RIGHT
 	NEW
+	REVIEW
 	Quit
 )
 
@@ -24,12 +25,13 @@ type Data [16]int
 
 // Puzzle si a 4*4 puzzle
 type Puzzle struct {
-	data   Data
-	notify chan<- Data
-	// review  []int
-	signal chan Signal
-	isDone bool
-	done   chan interface{}
+	data       Data
+	notify     chan<- Data
+	reviewData []Data
+	reviewReay bool
+	signal     chan Signal
+	isDone     bool
+	done       chan interface{}
 }
 
 // New create a Puzzle
@@ -39,7 +41,7 @@ func New(notify chan<- Data) *Puzzle {
 	}
 
 	p := &Puzzle{
-		data:   [16]int{},
+		data:   Data{},
 		notify: notify,
 		signal: make(chan Signal),
 		done:   make(chan interface{})}
@@ -50,11 +52,9 @@ func New(notify chan<- Data) *Puzzle {
 	return p
 }
 
-// ReStart is restart a new game
-func (p *Puzzle) ReStart() {
+// reStart is restart a new game
+func (p *Puzzle) reStart() {
 	p.init()
-
-	// todo review
 
 	p.notify <- p.data
 }
@@ -71,6 +71,7 @@ func (p *Puzzle) init() {
 	}
 
 	p.isDone = false
+	p.reviewReay = false
 }
 
 func (p *Puzzle) getSwapIndex() (int, error) {
@@ -88,11 +89,16 @@ func (p *Puzzle) waitMoveEvent() {
 		select {
 		case s := <-p.signal:
 			if s == NEW {
-				p.ReStart()
+				p.reStart()
 				continue
 			}
 
 			if p.isDone {
+				if s == REVIEW {
+					for _, x := range p.reviewData {
+						p.notify <- x
+					}
+				}
 				continue
 			}
 
@@ -110,6 +116,12 @@ func (p *Puzzle) waitMoveEvent() {
 				continue
 			}
 
+			if !p.reviewReay {
+				p.reviewData = make([]Data, 0)
+				p.reviewReay = true
+				p.reviewData = append(p.reviewData, p.data)
+			}
+
 			switch s {
 			case UP:
 				p.data[index], p.data[index-4] = p.data[index-4], p.data[index]
@@ -122,6 +134,7 @@ func (p *Puzzle) waitMoveEvent() {
 			}
 
 			p.notify <- p.data
+			p.reviewData = append(p.reviewData, p.data)
 
 			if p.data[15] == 0 {
 				p.checkDone()

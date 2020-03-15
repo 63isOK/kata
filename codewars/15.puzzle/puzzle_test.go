@@ -11,7 +11,7 @@ func TestConStruct(t *testing.T) {
 	go func() {
 		for i := 0; i < 100; i++ {
 
-			p.ReStart()
+			p.reStart()
 		}
 		close(allData)
 	}()
@@ -115,6 +115,7 @@ func TestDone(t *testing.T) {
 		for {
 			select {
 			case <-doneCh:
+				p.Send(REVIEW)
 				return
 			case <-time.After(time.Millisecond * 100):
 				t.Fatal("it shuoud be done,but not")
@@ -122,9 +123,26 @@ func TestDone(t *testing.T) {
 		}
 	}(t)
 
-	p.data = [16]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 15}
+	p.data = Data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 15}
 	p.Send(RIGHT)
 	<-dataCh
 
 	time.Sleep(time.Millisecond * 200)
+
+	data := <-dataCh
+	dataReview := Data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 15}
+	compareData(t, dataReview, data)
+	data = <-dataCh
+	dataReview = Data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0}
+	compareData(t, dataReview, data)
+}
+
+func compareData(t *testing.T, a, b Data) {
+	t.Helper()
+
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			t.Fatalf("review,want:%v,got:%v", a, b)
+		}
+	}
 }
