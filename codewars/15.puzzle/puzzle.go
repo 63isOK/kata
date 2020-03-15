@@ -33,8 +33,16 @@ type Puzzle struct {
 }
 
 // New create a Puzzle
-func New() *Puzzle {
-	p := &Puzzle{data: [16]int{}, signal: make(chan Signal), done: make(chan interface{})}
+func New(notify chan<- Data) *Puzzle {
+	if notify == nil {
+		return nil
+	}
+
+	p := &Puzzle{
+		data:   [16]int{},
+		notify: notify,
+		signal: make(chan Signal),
+		done:   make(chan interface{})}
 	p.init()
 
 	go p.waitMoveEvent()
@@ -42,18 +50,13 @@ func New() *Puzzle {
 	return p
 }
 
-// Start is start a new game
-func (p *Puzzle) Start() Data {
-	return p.ReStart()
-}
-
 // ReStart is restart a new game
-func (p *Puzzle) ReStart() Data {
+func (p *Puzzle) ReStart() {
 	p.init()
 
 	// todo review
 
-	return p.data
+	p.notify <- p.data
 }
 
 func (p *Puzzle) init() {
@@ -103,9 +106,7 @@ func (p *Puzzle) waitMoveEvent() {
 				(s == LEFT && index%4 == 0) ||
 				(s == RIGHT && index%4 == 3) {
 
-				if p.notify != nil {
-					p.notify <- p.data
-				}
+				p.notify <- p.data
 				continue
 			}
 
@@ -120,9 +121,7 @@ func (p *Puzzle) waitMoveEvent() {
 				p.data[index], p.data[index+1] = p.data[index+1], p.data[index]
 			}
 
-			if p.notify != nil {
-				p.notify <- p.data
-			}
+			p.notify <- p.data
 
 			if index == 15 {
 				p.checkDone()
@@ -142,11 +141,6 @@ func (p *Puzzle) checkDone() {
 	p.done <- 1
 }
 
-// Notify is a event fire on move event done
-func (p *Puzzle) Notify(c chan<- Data) {
-	p.notify = c
-}
-
 // Send is send signal to Puzzle object
 func (p *Puzzle) Send(s Signal) {
 	p.signal <- s
@@ -155,31 +149,4 @@ func (p *Puzzle) Send(s Signal) {
 // Done get done channel
 func (p *Puzzle) Done() <-chan interface{} {
 	return p.done
-}
-
-var std = New()
-
-// Start is start a new game
-func Start() Data {
-	return std.Start()
-}
-
-// ReStart is restart a new game
-func ReStart() Data {
-	return std.ReStart()
-}
-
-// Notify is a event fire on move event done
-func Notify(c chan<- Data) {
-	std.Notify(c)
-}
-
-// Send is send signal to Puzzle object
-func Send(s Signal) {
-	std.Send(s)
-}
-
-// Done get done channel
-func Done() <-chan interface{} {
-	return std.Done()
 }
