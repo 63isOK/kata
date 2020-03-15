@@ -6,7 +6,10 @@ import (
 	"time"
 )
 
-// move event
+// Signal is app signal which is used to control the puzzle
+type Signal int
+
+// app signal
 const (
 	UP Signal = iota + 1
 	DOWN
@@ -15,9 +18,6 @@ const (
 	NEW
 	Quit
 )
-
-// Signal is move direction
-type Signal int
 
 // Data is puzzle's data
 type Data [16]int
@@ -123,7 +123,7 @@ func (p *Puzzle) waitMoveEvent() {
 
 			p.notify <- p.data
 
-			if index == 15 {
+			if p.data[15] == 0 {
 				p.checkDone()
 			}
 		}

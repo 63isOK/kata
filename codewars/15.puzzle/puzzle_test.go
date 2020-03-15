@@ -2,6 +2,7 @@ package puzzle
 
 import (
 	"testing"
+	"time"
 )
 
 func TestConStruct(t *testing.T) {
@@ -104,4 +105,26 @@ func checkSwap(t *testing.T, data Data, do string, index int) {
 	if data[index] != 0 {
 		t.Fatalf("%s,want:0,data[%d] get:(%v)", do, index, data)
 	}
+}
+
+func TestDone(t *testing.T) {
+	dataCh := make(chan Data)
+	p := New(dataCh)
+	doneCh := p.Done()
+	go func(t *testing.T) {
+		for {
+			select {
+			case <-doneCh:
+				return
+			case <-time.After(time.Millisecond * 100):
+				t.Fatal("it shuoud be done,but not")
+			}
+		}
+	}(t)
+
+	p.data = [16]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 15}
+	p.Send(RIGHT)
+	<-dataCh
+
+	time.Sleep(time.Millisecond * 200)
 }
