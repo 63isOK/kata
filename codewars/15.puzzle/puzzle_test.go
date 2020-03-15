@@ -1,4 +1,4 @@
-package puzzle
+package main
 
 import (
 	"testing"

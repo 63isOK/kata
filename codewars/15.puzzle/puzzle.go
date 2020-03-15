@@ -1,4 +1,4 @@
-package puzzle
+package main
 
 import (
 	"errors"
@@ -49,6 +49,8 @@ func New(notify chan<- Data) *Puzzle {
 
 	go p.waitMoveEvent()
 
+	p.Send(NEW)
+
 	return p
 }
 
@@ -97,6 +99,7 @@ func (p *Puzzle) waitMoveEvent() {
 				if s == REVIEW {
 					for _, x := range p.reviewData {
 						p.notify <- x
+						time.Sleep(time.Second)
 					}
 				}
 				continue
