@@ -9,6 +9,7 @@
 - [x] [padding](/codewars/padding/README.md)
 - [x] [vaild parentheses](/codewars/parentheses/README.md)
 - [x] [100 doors](/codewars/100doors/README.md)
+- [ ] [hit 2](/leecode/hit2/README.md)
 
 ## License
 
