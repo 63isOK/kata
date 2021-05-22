@@ -16,6 +16,7 @@ FOUND:
 	return []int{i, j + i + 1}
 }
 
+// Hit2HashMap is a two-pass hash table
 func Hit2HashMap(arr []int, target int) []int {
 	hash := make(map[int]int, len(arr))
 	for i, v := range arr {
@@ -26,6 +27,19 @@ func Hit2HashMap(arr []int, target int) []int {
 		if j, ok := hash[target-v]; ok {
 			return []int{i, j}
 		}
+	}
+
+	return []int{}
+}
+
+// Hit2HashMap2 is a one-pass hash table
+func Hit2HashMap2(arr []int, target int) []int {
+	hash := make(map[int]int, len(arr))
+	for i, v := range arr {
+		if j, ok := hash[target-v]; ok {
+			return []int{j, i}
+		}
+		hash[v] = i
 	}
 
 	return []int{}

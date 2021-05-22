@@ -14,6 +14,10 @@ func TestHit2Hash(t *testing.T) {
 	hit2(t, Hit2HashMap)
 }
 
+func TestHit2Hash2(t *testing.T) {
+	hit2(t, Hit2HashMap2)
+}
+
 func hit2(t *testing.T, impl func([]int, int) []int) {
 	input_arr := []int{3, 4, 2}
 	input_target := 5
