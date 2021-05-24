@@ -157,25 +157,30 @@ func hit3Point(input_arr []int) [][]int {
 
 	length := len(input_arr)
 
-	next = func(arr []int, current int) int{
-		nextPos = current + 1
-		// todo
-		
+	next := func(arr []int, current int) int {
+		nextPos := current + 1
+		for ; nextPos < len(arr); nextPos++ {
+			if arr[current] != arr[nextPos] {
+				break
+			}
+		}
+
+		return nextPos
 	}
 
 	// match
-	for i := 0; i < length-2; i=next(input_arr[:length-2],i){
-		j := i+1
-		k := length -1
-		for ;j!=k;{
-			sum := input_arr[i]+input_arr[j]+input_arr[k]
+	for i := 0; i < length-2; i = next(input_arr[:length-2], i) {
+		j := i + 1
+		k := length - 1
+		for j != k {
+			sum := input_arr[i] + input_arr[j] + input_arr[k]
 			if sum == 0 {
-				ret = append(ret,[]int{input_arr[i], input_arr[j], input_arr[k]})
-				j=next(input_arr[:k]], j)
+				ret = append(ret, []int{input_arr[i], input_arr[j], input_arr[k]})
+				j = next(input_arr[:k], j)
 				continue
-			}else if sum < 0 {
+			} else if sum < 0 {
 				j++
-			}else{
+			} else {
 				k--
 			}
 		}
