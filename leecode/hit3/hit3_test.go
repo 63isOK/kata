@@ -40,3 +40,12 @@ func BenchmarkHit3(b *testing.B) {
 		hit3(input_arr)
 	}
 }
+
+func TestHit3Point(t *testing.T) {
+	input_arr := []int{-1, 0, 1, 2, -1, -4}
+	want := [][]int{
+		[]int{-1, -1, 2},
+		[]int{-1, 0, 1}}
+	got := hit3Point(input_arr)
+	assert.ElementsMatch(t, got, want)
+}
