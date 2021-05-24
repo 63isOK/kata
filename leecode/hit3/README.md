@@ -25,7 +25,7 @@ eg: 1 1 2 -1 -1 0, 输出是`[-1,0,1],[-1,-1,2]`
   - 第一次的循环是构建hash表
   - 第二次循环是二层循环,第一层是将hit3降为hit2,第二层是找剩下两个数
 
-`go test -v -bench . -cpuprofile cpu.prof`,`go tool pprof -http=:9999 cpu.prof `
+`go test -v -bench . -cpuprofile cpu.prof`,`go tool pprof -http=:9999 cpu.prof`
 可以分析cpu性能,单词执行测试时间太短,用bench测试,可以看出fmt.Sprintf消耗了70%的性能,
 这点可以重点优化.
 
